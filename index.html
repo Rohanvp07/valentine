@@ -1,46 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Fullscreen iFrame</title>
+    <title>Cricket Match Stream</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <style>
         body, html {
             margin: 0;
             padding: 0;
             height: 100%;
+            background: #000;
+            font-family: 'Segoe UI', sans-serif;
             overflow: hidden;
         }
+
         iframe {
             position: absolute;
-            top: 0;
-            left: 0;
+            inset: 0;
             width: 100%;
             height: 100%;
             border: none;
         }
+
+        /* Glass UI */
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+
+            display: flex;
+            gap: 10px;
+            padding: 14px;
+
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+
+        select, button {
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: none;
+            outline: none;
+            font-size: 14px;
+        }
+
+        select {
+            background: rgba(255,255,255,0.9);
+            min-width: 140px;
+        }
+
+        button {
+            background: #ff3d00;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            opacity: 0.9;
+        }
+
+        /* Toggle button */
+        .toggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 11;
+
+            background: rgba(0,0,0,0.6);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            .controls {
+                flex-direction: column;
+                bottom: 15px;
+            }
+
+            select {
+                width: 100%;
+            }
+        }
     </style>
 </head>
+
 <body>
-  <!--  <iframe  src='https://embedsports.me/epl/tottenham-hotspur-vs-manchester-city-stream-1' allowfullscreen allowtransparency></iframe> -->
-      <iframe  src='https://embedsports.me/cricket-world-cup/scotland-vs-west-indies-stream-1' allowfullscreen allowtransparency></iframe>
+
+<div class="toggle" onclick="toggleControls()">⚙️ Controls</div>
+
+<div class="controls" id="controls">
+    <select id="team1"></select>
+    <select id="team2"></select>
+    <button onclick="loadMatch()">▶ Play</button>
+</div>
+
+<iframe id="matchFrame" allowfullscreen allowtransparency></iframe>
+
+<script>
+    const teams = [
+        "India","Australia","England","Pakistan","South Africa","New Zealand",
+        "Sri Lanka","West Indies","Bangladesh","Afghanistan","Ireland","Scotland",
+        "Netherlands","Nepal","Namibia","Zimbabwe","United States Of America","Canada",
+        "United Arab Emirates","Oman"
+    ];
+
+    const team1 = document.getElementById("team1");
+    const team2 = document.getElementById("team2");
+    const controls = document.getElementById("controls");
+
+    function populate() {
+        team1.innerHTML = `<option value="">Team 1</option>`;
+        team2.innerHTML = `<option value="">Team 2</option>`;
+
+        teams.forEach(t => {
+            team1.add(new Option(t, t));
+            team2.add(new Option(t, t));
+        });
+    }
+
+    function formatTeam(t) {
+        return t.toLowerCase().replace(/\s+/g, '-');
+    }
+
+    function loadMatch() {
+        if (!team1.value || !team2.value) return alert("Select both teams");
+        if (team1.value === team2.value) return alert("Teams must be different");
+
+        const url = `https://embedsports.me/cricket-world-cup/${formatTeam(team1.value)}-vs-${formatTeam(team2.value)}-stream-1`;
+        document.getElementById("matchFrame").src = url;
+
+        // auto-hide controls after play
+        controls.style.display = "none";
+    }
+
+    function toggleControls() {
+        controls.style.display =
+            controls.style.display === "none" ? "flex" : "none";
+    }
+
+    populate();
+</script>
 
 </body>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+</html>
